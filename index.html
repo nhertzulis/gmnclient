@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- Informacion de cabecera -->
+	<meta name="language" content="spanish" />
+	<meta name="Author" content="Nicolas Hertzulis" />
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<title>GMN</title>
+	
+	<!-- Referencias a hojas de estilos -->
+	<link rel="stylesheet" type="text/css" href="css/style.css"/>
+	
+	<!-- Referencias a archivos javascript -->
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+	<script type="text/javascript" src="js/main.js"></script>
+	
+	<!-- Comienzo script principal -->
+	<script type="text/javascript">
+		var Client = GuessMyNumberClientFramework(); //Es un namespace que retorna un JSON de funciones
+		
+		$(document).ready(function(){
+			
+			//Escondo las div correspondientes
+			$("#divSetNumber").hide();
+			$("#divBoard").hide();
+			$("#PlayerTable").hide();
+			$("#PlayerCommands").hide();
+			
+			//Asocio los metodos a su correspondiente boton
+			$("#btnLogin").click(function(){Client.Register()});
+			$("#btnSetNumber").click(function(){Client.SetNumber()});
+			$("#btnGuess").click(function(){Client.AttemptNumber()});
+			
+		});
+	</script>	
+</head>
+<body>
+	<div id="upper-container" class="user-info">
+		<div id="upper-content" class="user-info"></div>
+	</div>
+	<!-- Comienzo container -->
+	<div id="container" class="container">			
+	
+		<!-- Comienzo main-content -->
+		<div id="main-content">
+			<h1>GuessMyNumber</h1>
+			
+			<!-- Comienzo divLogin -->
+			<div id="divLogin">
+				<h2>Ingresar como invitado!</h2>
+				Nombre: <input type="text" id="txtName" name="name"><br/>
+				Servidor: <input type="text" id="txtServer" name="server" value="http://guessmynumber.jurgens.com.ar"><br/>
+				Puerto: <input type="text" id="txtPort" name="port" value="80"><br/><br/>
+				<span id="LoginResponse" style="color: red"></span><br/>
+				<button id="btnLogin">Aceptar</button>
+			</div> <!-- Fin divLogin -->
+			
+			<!-- Comienzo divSetNumber -->
+			<div id="divSetNumber">
+				<h2>Setear numero</h2>
+				Debe contener 4 digitos distintos:<br/>
+				<input type="text" id="txtNr" name="number" maxlength="4" value="1234"><br/><br/>
+				<span id="SetNumberResponse" style="color: red"></span><br/>
+				<button id="btnSetNumber">Aceptar</button>
+			</div> <!-- Fin divSetNumber -->
+			
+			<!-- Comienzo divBoard-->
+			<div id="divBoard">
+				<h2>Selecciona tu objetivo:</h2>
+				<div id="BoardSuperContainer">
+					<div id="BoardContainer" style="float: left; width: 70%">
+					</div>
+					<div id="PlayerContainer" style="float: right; width: 30%">
+						<div id="BoardResponse"></div>
+						<div id="PlayerBadge"></div>
+						<div id="PlayerTable">
+							<table id="tblNumbersGuessed" border="2">
+								<thead>
+									<tr>
+										<th>Numero</th>
+										<th>Correctos</th>
+										<th>Existentes</th>
+									</tr>
+								</thead>
+								<tbody>
+								</tbody>
+							</table>
+						</div>
+						<div id="PlayerCommands">
+							Adivina el numero secreto!<br/>
+							<span id="Attempt"></span> <input type="text" id="txtGuess" name="number" maxlength="4">
+							<button id="btnGuess">Aceptar</button><br/>
+							<span id="AttemptNumberResponse" style="color: red"></span>	
+						</div>
+					</div>
+				</div>
+			</div> <!-- Fin divBoard -->
+		</div> <!-- Fin main-content --> 
+	</div><!-- Fin container --> 
+</body>
+</html>

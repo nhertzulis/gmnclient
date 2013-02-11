@@ -1,0 +1,19 @@
+.user-info {
+	background-color: #FF3867;
+	margin: 0px;
+	/*font-weight: bold;*/
+}
+
+.container {
+	margin-left: 50px;
+}
+
+#upper-content {
+	width: 768px;
+	margin: auto;
+}
+
+body {
+	margin: 0px;
+	background-color: #FFE7FF;
+}
