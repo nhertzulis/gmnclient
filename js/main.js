@@ -404,14 +404,6 @@ var GuessMyNumberClientFramework = function(){
 		
 	}
 	
-	// Método para ordenar un array de mayor a menor por un índice específico:
-	//var SortArray = function(Arr) {
-	//}
-	//function compareNumbers(a, b) {
-	//	return a - b;
-	//}
-
-	
 	// Método para mostrar los puntajes:
 	var ShowScores = function(){
 	
@@ -421,14 +413,8 @@ var GuessMyNumberClientFramework = function(){
 		
 		// Si el request fue exitoso:
         Request.done(function(response) {
-            //var Arr = [];
 			var r = response["players"]; // AJAX response.
-			//for (var i in r) {
-			//	Arr.push(r[i, 0]);
-			//}
-			//r.sort(compareNumbers);
-			
-			
+						
             // Dibujo el ranking:
 			$("#tblRanking tbody").html("");
             for(i in response["players"]){
@@ -440,7 +426,15 @@ var GuessMyNumberClientFramework = function(){
 				$("#tblRanking tr#" + r.publicUuid).append("<td>" + (r.numberActivated ? "Si" : "No") + "</td>");
 				$("#tblRanking tr#" + r.publicUuid).append("<td>" + (r.score).toString() + "</td>");
 			
-            }   
+            }
+			
+			$("#tblNumbersGuessed tbody > tr:first").before("<tr id=" + response["me"][0]["privateUuid"] + "></tr>");
+			$("#tblRanking tr#" + response["me"][0]["privateUuid"]).append("<td>" + CreateIdenticon(response["me"][0]["privateUuid"], "", 40) + "</td>");
+			$("#tblRanking tr#" + response["me"][0]["privateUuid"]).append("<td>" + (response["me"][0]["numberActivated"] ? "Si" : "No") + "</td>");
+			$("#tblRanking tr#" + response["me"][0]["privateUuid"]).append("<td>" + (response["me"][0]["score"]).toString() + "</td>");
+			$("#tblRanking tr#" + response["me"][0]["privateUuid"]).attr("class", "ownRow");
+			
+				
             //BoardRefreshInterval = self.setInterval(function(){ RefreshBoard(); }, 1000); // Actualiza el tablero cada 1 segundo.
 			window.clearInterval(BoardRefreshInterval);
 			$("#divBoard").hide();

@@ -65,6 +65,9 @@ Last modified: 12/02/2013
 	background-color: #1A1816;
 	color: #ffffff;
 }
+.ownRow {
+	background-color: green;
+}
 .table tr.alt td  {
 	color:#000000;
 	background-color:#EAF2D3;
