@@ -71,7 +71,7 @@ var GuessMyNumberClientFramework = function(){
 			// Si el request fue exitoso:
             Request.done(function(response) {
 				// Mensaje de bienvenida:
-				var Msg = "<span id='welcome'>Hola, <span id='username'>" + PlayerJSON["name"] + "</span>!</span> | <span id='scoretop'></span> | Numero seteado: " + response["number"];
+				var Msg = "<span id='welcome'>Hola, <span id='username'>" + PlayerJSON["name"] + "</span>!</span> | <span id='scoretop'>Puntos: 0</span> | Numero seteado: " + response["number"];
                 $("#upper-content").html(Msg);
 				
 				// Pasa a la pantalla del tablero de jugadores:
