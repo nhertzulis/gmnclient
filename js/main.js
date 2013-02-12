@@ -71,7 +71,7 @@ var GuessMyNumberClientFramework = function(){
 			// Si el request fue exitoso:
             Request.done(function(response) {
 				// Mensaje de bienvenida:
-				var Msg = "<span id='welcome'>Hola, <span id='username'>" + PlayerJSON["name"] + "</span>!</span> Numero seteado: " + response["number"];
+				var Msg = "<span id='welcome'>Hola, <span id='username'>" + PlayerJSON["name"] + "</span>!</span> | <span id='scoretop'></span> | Numero seteado: " + response["number"];
                 $("#upper-content").html(Msg);
 				
 				// Pasa a la pantalla del tablero de jugadores:
@@ -233,6 +233,7 @@ var GuessMyNumberClientFramework = function(){
             }	
 			
 			// Luego de haber mostrado el tablero, pone el foco en el Input Text para probar números:
+			$("#scoretop").html("Puntos: " + response["me"][0]["score"]);
 			$("#txtGuess").focus();
         });
 
