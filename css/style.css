@@ -1,19 +1,85 @@
-.user-info {
-	background-color: #FF3867;
+/*
+--------------------------------------------------
+Author: Nicolás Hertzulis
+Organization: Despegar.com
+GitHub repository: https://github.com/nhertzulis/gmnclient
+Description: Style for index.html. GuessMyNumber - browser-based online game for educational purposes. API Documentation: www.guessmynumber.jurgens.com.ar/doc
+Last modified: 11/02/2013
+-------------------------------------------------- */
+ 
+#welcome {
+	font-weight: bold;
+}
+#username {
+	text-decoration: underline;
+}
+#logo {
+	/*float: left;*/
+	height: 100px;
+	width: 70%;
 	margin: 0px;
-	/*font-weight: bold;*/
 }
-
-.container {
-	margin-left: 50px;
-}
-
 #upper-content {
-	width: 768px;
+	/*float: right;
+	height: 100px;*/
+	margin: 0px;
+	background-color: lightblue;
+	text-align: center;
+}
+#upper-container2 {
+	width: 1024px;
+}
+#BoardContainer {
+	float: left;
+	width: 70%;
+}
+#PlayerContainer {
+	float: right;
+	width: 30%;
+}
+#tblNumbersGuessed {
+	width: 100%;
+	border-collapse: collapse;
+}
+#tblNumbersGuessed td, #tblNumbersGuessed th {
+	border: 1px solid blue;
+	padding: 0px 0px 0px 0px;
+}
+#tblNumbersGuessed th  {
+	text-align: left;
+	/*padding-top: 5px;
+	padding-bottom: 4px;
+	background-color: #FF3867;*/
+	background-color: blue;
+	color: #ffffff;
+}
+#tblNumbersGuessed tr.alt td  {
+	color:#000000;
+	background-color:#EAF2D3;
+}
+.PlayerBadge {
+	border: 1px dashed grey;
+	padding: 2px;
+}
+.SelectedBadge {
+	border: 3px solid blue;
+}
+.BigBadge {
+	border: 3px dashed grey;
+}
+.container {
+	width: 1024px;
 	margin: auto;
 }
-
+.user-info {
+	background-color: #FF3867;
+	margin-top: 0px;
+	margin-left: 50px;
+	margin: auto;
+}
 body {
+	font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
 	margin: 0px;
 	background-color: #FFE7FF;
+	
 }

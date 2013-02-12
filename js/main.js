@@ -1,10 +1,12 @@
 var GuessMyNumberClientFramework = function(){
-	var PlayerID; //La ID del jugador
-	var CurrentTarget; //La ID del jugador al que se le esta adivinando el numero actualmente
-    var BoardRefreshInterval; //Para actualizar el tablero automaticamente
-    var AttemptedNumbers = {}; //Guarda el historico de numeros intentados
-    var UrlServer;
-    var PortServer;
+	var PlayerID, //La ID del jugador
+		CurrentTarget, //La ID del jugador al que se le esta adivinando el numero actualmente
+		BoardRefreshInterval, //Para actualizar el tablero automaticamente
+		AttemptedNumbers = {}, //Guarda el historico de numeros intentados
+		UrlServer,
+		PortServer,
+		PlayerJSON = {};
+	
 	
 	// Metodo para registrar el usuario
     var Register = function(){
@@ -22,11 +24,14 @@ var GuessMyNumberClientFramework = function(){
         var Request = $.ajax({ type: "GET", url: Url, dataType: "json" });
         
         Request.done(function(response){
+			PlayerJSON = response;
             PlayerID = response["privateUuid"]; //variable global
-			var Msg = "Hola, " + response["name"] + "!<br/>ID: " + PlayerID; //mensaje de bienvenida al nuevo usuario
+			var Msg = "<span id='welcome'>Hola, <span id='username'>" + response["name"] + "</span>!</span>"; //mensaje de bienvenida al nuevo usuario
 			$("#upper-content").html(Msg); //mando el mensaje en el div horizontal superior
 			$("#divLogin").hide();
 			$("#divSetNumber").show();
+			$("#txtNr").val(GenerateNum_4uniqueCharacters());
+			$("#txtNr").focus();
         })
         
         Request.fail(function(jqXHR, textStatus){
@@ -47,8 +52,8 @@ var GuessMyNumberClientFramework = function(){
             var Request = $.ajax({ type: "GET", url: Url, dataType: "json" });
             
             Request.done(function(response) { 
-				var Msg = "<br/>Numero seteado: " + response["number"];
-                $("#upper-content").append(Msg);
+				var Msg = "<span id='welcome'>Hola, <span id='username'>" + PlayerJSON["name"] + "</span>!</span> Numero seteado: " + response["number"];
+                $("#upper-content").html(Msg);
 				$("#divSetNumber").hide();
 				$("#divBoard").show();
 				ShowBoard();
@@ -60,6 +65,7 @@ var GuessMyNumberClientFramework = function(){
 					var Msg = "Se ha reiniciado el servidor o supero el tiempo de inactividad, registrese nuevamente.";
 					$("#divSetNumber").hide();
 					$("#divLogin").show();
+					$("#txtName").focus();
 					$("#upper-content").html(Msg);
                 }
                 else if(jqXHR.status == 528)
@@ -95,12 +101,12 @@ var GuessMyNumberClientFramework = function(){
 	
 	//Metodo para mostrar el tablero de jugadores
 	var ShowBoard = function(){        
-        var Url = UrlServer + ":" + PortServer + "/players/board/" + PlayerID;
-        var Request = $.ajax({ type: "GET", url: Url, dataType: "json" });
+        var Url = UrlServer + ":" + PortServer + "/players/board/" + PlayerID,
+			Request = $.ajax({ type: "GET", url: Url, dataType: "json" });
 
         Request.done(function(response) {
-            var TableRow; // Fila del tablero de jugadores
-			var UUID; // Universally unique identifier
+            var TableRow, // Fila del tablero de jugadores
+				UUID; // Universally unique identifier
 			
             // Dibujo la tabla de jugadores con numero activado
             for(var i in response["players"]){
@@ -126,18 +132,20 @@ var GuessMyNumberClientFramework = function(){
 			}
 			$("#divBoard").hide();
 			$("#divLogin").show();
+			$("#txtName").focus();
         });
+		$("#txtGuess").focus();
     }
 	
 	// Metodo para actualizar el tablero de jugadores
     var RefreshBoard = function ()
     {
-        var Url = UrlServer + ":" + PortServer + "/players/board/" + PlayerID;
-        var Request = $.ajax({ type: "GET", url: Url, dataType: "json" });
+        var Url = UrlServer + ":" + PortServer + "/players/board/" + PlayerID,
+			Request = $.ajax({ type: "GET", url: Url, dataType: "json" });
 
         Request.done(function(response) {
-            var TableRow; // Fila del tablero de jugadores
-			var UUID; // Universally unique identifier
+            var TableRow, // Fila del tablero de jugadores
+				UUID; // Universally unique identifier
 
             // Verifico que no me hayan adivinado el numero, en caso de error lo mando a la pantalla para que setee el numero nuevamente
             if(response["me"][0]["numberActivated"] == false){
@@ -145,6 +153,7 @@ var GuessMyNumberClientFramework = function(){
 				$("#divBoard").hide();
 				$("#divSetNumber").show();
 				$("#SetNumberResponse").html("Su numero ha sido adivinado. Por favor, ingrese otro para continuar.");
+				$("#txtNr").focus();
                 return;
             }
 			
@@ -163,6 +172,8 @@ var GuessMyNumberClientFramework = function(){
                     }(UUID)) //Closure super archi copado
                 }
             }
+			$("#PlayerBadge > img").attr("class", "PlayerBadge"); // Aplico a todos los escudos el estilo por defecto
+			if (flag) $("#img" + CurrentTarget).attr("class", "SelectedBadge"); // Destaco el escudo seleccionado
 
             // Verifico que el jugador este en la lista de activos
             if (!flag){
@@ -188,18 +199,20 @@ var GuessMyNumberClientFramework = function(){
 			// Muestro las <div> correspondientes.
 			$("#divBoard").hide();
 			$("#divLogin").show();
+			$("#txtName").focus();
 			
         });
-		
+		$("#txtGuess").focus();
     }
 	
 	// Metodo para mostrar avatares identicon
 	var CreateIdenticon = function(UUID, Size){
-		var ShorterUUID = UUID.substring(0, 8); // Trunca el string // 0=comienzo // 8=longitud
-		var _Size = "&s=" + Size;
-		var ImgURL = "http://www.gravatar.com/avatar/" + ShorterUUID + "?d=identicon&r=PG";
+		var ShorterUUID = UUID.substring(0, 8), // Trunca el string // 0=comienzo // 8=longitud
+			_Size = "&s=" + Size,
+			ImgURL = "http://www.gravatar.com/avatar/" + ShorterUUID + "?d=identicon&r=PG",
+			ImgHTML;
 		ImgURL += Size ? _Size : "";
-		var ImgHTML = '<img border="1" style="color: grey" id=img' + UUID + ' src=' + ImgURL + '></img> ';
+		ImgHTML = '<img class="PlayerBadge" id=img' + UUID + ' src=' + ImgURL + '></img> ';
 		return ImgHTML;
 	}
 	
@@ -220,8 +233,13 @@ var GuessMyNumberClientFramework = function(){
 
         Request.done(function(response) {
                 var NumberRow = '<tr id="' + response["numberId"] + '"><td>' + response["number"] + '</td> <td>' + response["correctChars"] + '</td><td>' + response["existingChars"] + '</td></tr>';
-
-                $("#tblNumbersGuessed tbody").append(NumberRow);
+				
+				$("#tblNumbersGuessed").show();
+				if ($("#tblNumbersGuessed tbody").html()) {
+					$("#tblNumbersGuessed tbody > tr:first").before(NumberRow);
+				} else {
+					$("#tblNumbersGuessed tbody").append(NumberRow);
+				}
 
                 // Guardo el historico de numeros intentados
 				var auxJson = {"numberId": response["numberId"], "number": response["number"], "correct": response["correctChars"], "incorrect": response["wrongChars"], "exist": response["existingChars"]}
@@ -252,6 +270,7 @@ var GuessMyNumberClientFramework = function(){
             else
                 $("#AttemptNumberResponse").html(jqXHR.status + " Error desconocido.");
         });
+		$("#txtGuess").focus();
     } 
 	
 	// Metodo para mostrar los intentos de adivinacion realizados
@@ -262,7 +281,7 @@ var GuessMyNumberClientFramework = function(){
                 var Row = '<tr id="' + AttemptedNumbers[UUID][i]["numberId"] + '"><td>' + AttemptedNumbers[UUID][i]["number"] + '</td> <td>' + AttemptedNumbers[UUID][i]["correct"] + '</td><td>' + AttemptedNumbers[UUID][i]["exist"] + '</td></tr>';
                 $("#tblNumbersGuessed tbody").append(Row);
             }
-            //$("#tblNumbersGuessed").show();
+            if (i > 0) $("#tblNumbersGuessed").show();
         }
 	}
 	
@@ -275,47 +294,40 @@ var GuessMyNumberClientFramework = function(){
 		$("#txtGuess").val(""); // Borra el ultimo numero ingresado
 		$("#AttemptNumberResponse").html(""); // Borra el ultimo mensaje enviado
 		$("#tblNumbersGuessed tbody").html(""); // Borra los intentos realizados
+		$("#tblNumbersGuessed").hide();
+		//$("#img" + UUID).attr("style", "color: red");
+		$("#PlayerBadge > img").attr("class", "PlayerBadge"); // Aplico a todos los escudos el estilo por defecto
+		$("#img" + UUID).attr("class", "SelectedBadge"); // Destaco el escudo seleccionado
 		ShowAttempts(UUID); // Muestra los intentos realizados a este jugador anteriormente
 	}
 	
+	// Metodo para generar nombres aleatorios
+	var GeneratePlayerName = function(){
+		var PlayerName =  "Jugador" + (Math.floor(Math.random() * (100000))).toString();
+		return PlayerName;
+	}
+	
+	// Metodo para mezclar un array
+	shuffle = function(o){
+		for(var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+		return o;
+	};
+	
 	// Metodo para generar numero aleatorio de 4 cifras distintas
-	/*var GenerateNum_4uniqueCharacters = function(){
-		var Num = new Array();
-		for (var i = 0; i < 4; i++) {
-			do {
-				var Num[i] = Math.floor(Math.random() * (10));
-			} while (function(){
-				for (var j = 0; j < Num.length; j++) {
-					if (Num[i] == Num[j]) return true;
-				}
-				return false;
-			});
+	GenerateNum_4uniqueCharacters = function(){
+		var Array = shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+		var String = Array[0].toString();
+		for (var i = 1; i < 4; i++) {
+			String += Array[i].toString();
 		}
-		for (i = 0; i < Num.length; i++) {
-			NumStr += Num[i].toString();
-		}
-		return NumStr;
-		
-		
-		for (var i = 0; i < 3; i++) {
-				var PossibleNum;
-				do {
-					PossibleNum = (Math.floor(Math.random() * (10))).toString();
-				}
-				while (function(){
-					for (var j = 0; j < Num.length; j++) {
-						if (PossibleNum == Num.charAt(j)) return true;
-					}
-					return false;
-				});
-				Num += PossibleNum.toString();
-		}
-		return Num;
-	}*/
+		return String;
+	}
 	
 	return {
-        "Register":      function() { Register(); },
-        "SetNumber":     function() { SetNumber(); },
-        "AttemptNumber": function() { AttemptNumber(); }
+        "Register": function() { Register(); },
+        "SetNumber": function() { SetNumber(); },
+        "AttemptNumber": function() { AttemptNumber(); },
+		"GeneratePlayerName": function() { GeneratePlayerName(); },
+		"GenerateNum_4uniqueCharacters": function() { GenerateNum_4uniqueCharacters(); }
     }
 }

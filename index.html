@@ -18,6 +18,14 @@
 	<script type="text/javascript">
 		var Client = GuessMyNumberClientFramework(); //Es un namespace que retorna un JSON de funciones
 		
+		// Funcion para enviar formularios apretando Enter
+		SetIntroShortcut = function(element, method) {
+			$(element).keypress(function(event){
+				var keyPressed = (event.keyCode ? event.keyCode : event.which);
+				if (keyPressed == '13') method();
+			});
+		}
+		
 		$(document).ready(function(){
 			
 			//Escondo las div correspondientes
@@ -25,6 +33,12 @@
 			$("#divBoard").hide();
 			$("#PlayerTable").hide();
 			$("#PlayerCommands").hide();
+			$("#txtName").val("Jugador" + (Math.floor(Math.random() * (100000))).toString()).focus();
+			SetIntroShortcut("#txtName", function(){Client.Register()});
+			SetIntroShortcut("#txtServer", function(){Client.Register()});
+			SetIntroShortcut("#txtPort", function(){Client.Register()});
+			SetIntroShortcut("#txtNr", function(){Client.SetNumber()});
+			SetIntroShortcut("#txtGuess", function(){Client.AttemptNumber()});
 			
 			//Asocio los metodos a su correspondiente boton
 			$("#btnLogin").click(function(){Client.Register()});
@@ -36,6 +50,12 @@
 </head>
 <body>
 	<div id="upper-container" class="user-info">
+		<div id="upper-container2" class="upper-container2">
+			<div id="logo" class="user-info">
+				<h1 style="margin-top: 0">GuessMyNumber</h1>
+				<h2>Browser-game for educational purposes</h3>
+			</div>
+		</div>
 		<div id="upper-content" class="user-info"></div>
 	</div>
 	<!-- Comienzo container -->
@@ -43,11 +63,10 @@
 	
 		<!-- Comienzo main-content -->
 		<div id="main-content">
-			<h1>GuessMyNumber</h1>
-			
+		
 			<!-- Comienzo divLogin -->
 			<div id="divLogin">
-				<h2>Ingresar como invitado!</h2>
+				<h3>Ingresar como invitado!</h2>
 				Nombre: <input type="text" id="txtName" name="name"><br/>
 				Servidor: <input type="text" id="txtServer" name="server" value="http://guessmynumber.jurgens.com.ar"><br/>
 				Puerto: <input type="text" id="txtPort" name="port" value="80"><br/><br/>
@@ -57,7 +76,7 @@
 			
 			<!-- Comienzo divSetNumber -->
 			<div id="divSetNumber">
-				<h2>Setear numero</h2>
+				<h3>Setear numero</h2>
 				Debe contener 4 digitos distintos:<br/>
 				<input type="text" id="txtNr" name="number" maxlength="4" value="1234"><br/><br/>
 				<span id="SetNumberResponse" style="color: red"></span><br/>
@@ -66,15 +85,21 @@
 			
 			<!-- Comienzo divBoard-->
 			<div id="divBoard">
-				<h2>Selecciona tu objetivo:</h2>
+				<h3>Selecciona tu objetivo:</h2>
 				<div id="BoardSuperContainer">
-					<div id="BoardContainer" style="float: left; width: 70%">
+					<div id="BoardContainer">
 					</div>
-					<div id="PlayerContainer" style="float: right; width: 30%">
+					<div id="PlayerContainer">
 						<div id="BoardResponse"></div>
 						<div id="PlayerBadge"></div>
+						<div id="PlayerCommands">
+							Adivina su numero secreto!<br/>
+							<span id="Attempt"></span> <input type="text" id="txtGuess" name="number" maxlength="4">
+							<button id="btnGuess">Aceptar</button><br/>
+							<span id="AttemptNumberResponse" style="color: red"></span>	
+						</div><br/>
 						<div id="PlayerTable">
-							<table id="tblNumbersGuessed" border="2">
+							<table id="tblNumbersGuessed">
 								<thead>
 									<tr>
 										<th>Numero</th>
@@ -85,12 +110,6 @@
 								<tbody>
 								</tbody>
 							</table>
-						</div>
-						<div id="PlayerCommands">
-							Adivina el numero secreto!<br/>
-							<span id="Attempt"></span> <input type="text" id="txtGuess" name="number" maxlength="4">
-							<button id="btnGuess">Aceptar</button><br/>
-							<span id="AttemptNumberResponse" style="color: red"></span>	
 						</div>
 					</div>
 				</div>
