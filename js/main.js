@@ -8,21 +8,24 @@ var GuessMyNumberClientFramework = function(){
 		PlayerJSON = {};
 	
 	
-	// Metodo para registrar el usuario
+	// Método para registrar el usuario:
     var Register = function(){
 		$("#LoginResponse").html("");
         UrlServer = $("#txtServer").val();
         PortServer = $("#txtPort").val().trim();
         var Name = $("#txtName").val().trim(); 
-
+		
+		// Validación del puerto y el nombre ingresados:
         if(Name.length == 0 || isNaN(PortServer) || PortServer.length == 0){
             $("#LoginResponse").html("Nombre de usuario o puerto invalido.");
             return false;
         }
 		
+		// Guarda la URL para registrar el usuario en una variable y hace el request AJAX:
         var Url = UrlServer + ":" + PortServer + "/players/register/" + Name;
         var Request = $.ajax({ type: "GET", url: Url, dataType: "json" });
         
+		// Si el request fue exitoso:
         Request.done(function(response){
 			PlayerJSON = response;
             PlayerID = response["privateUuid"]; //variable global
@@ -34,6 +37,7 @@ var GuessMyNumberClientFramework = function(){
 			$("#txtNr").focus();
         })
         
+		// Si el request fue fallido:
         Request.fail(function(jqXHR, textStatus){
             if(jqXHR.status == 520)
 				$("#LoginResponse").html("El usuario ya se encuentra registrado.");
@@ -42,25 +46,34 @@ var GuessMyNumberClientFramework = function(){
         })
     }
 	
-	// Metodo para cargar el numero al usuario
+	// Método para setear el número elegido por el usuario:
     var SetNumber = function(){
-		$("#SetNumberResponse").html("");
-        var Num = $("#txtNr").val();    
-
-        if(validateNumber(Num) != false){
+		$("#SetNumberResponse").html(""); // Borra el mensaje de error anterior.
+        var Num = $("#txtNr").val(); // Guarda el número en una variable
+		
+		// Si el número ingresado es válido:
+        if(validateNumber(Num)){
+		
+			// Guardo la URL para setear el número y hago el request AJAX:
             var Url = UrlServer + ":" + PortServer + "/play/setnumber/" + PlayerID + "/" + Num;
             var Request = $.ajax({ type: "GET", url: Url, dataType: "json" });
             
-            Request.done(function(response) { 
+			// Si el request fue exitoso:
+            Request.done(function(response) {
+				// Mensaje de bienvenida:
 				var Msg = "<span id='welcome'>Hola, <span id='username'>" + PlayerJSON["name"] + "</span>!</span> Numero seteado: " + response["number"];
                 $("#upper-content").html(Msg);
+				
+				// Pasa a la pantalla del tablero de jugadores:
 				$("#divSetNumber").hide();
 				$("#divBoard").show();
 				ShowBoard();
 				
             });                         
         
+			// Si el request fue fallido:
             Request.fail(function(jqXHR, textStatus) {
+				// Verifica los códigos de error indicados en la API de GuessMyNumber:
                 if(jqXHR.status == 521){
 					var Msg = "Se ha reiniciado el servidor o supero el tiempo de inactividad, registrese nuevamente.";
 					$("#divSetNumber").hide();
@@ -75,17 +88,19 @@ var GuessMyNumberClientFramework = function(){
                 else
                     $("#SetNumberResponse").html(jqXHR.status + " Error desconocido.");
             });
+			
+		// En caso que el número ingresado no es válido:
         } else {
             $("#SetNumberResponse").html("Numero no valido. Debe contener 4 caracteres y todas sus cifras deben ser distintas. ");
 		}
     }
 	
-	// Metodo para validar el numero ingresado
+	// Método para validar el número ingresado
     var validateNumber = function(number){
-        // Compruebo que sea un numero y tenga 4 digitos
+        // Comprueba que sea un número y tenga exactamente 4 dígitos:
         if (isNaN(number) || number.length < 4) return false;
         		
-        // Compruebo que no se repitan
+        // Comprueba que los 4 caracteres no se repitan:
         var ArrayNum = new Array(number.charAt(0), number.charAt(1), number.charAt(2), number.charAt(3));
         for (var i = 0; i < ArrayNum.length; i++){
             for (var j = 0; j < ArrayNum.length; j++){
@@ -95,61 +110,77 @@ var GuessMyNumberClientFramework = function(){
             }    
         }
 		
-		// Si llego hasta aqui, el numero es valido
+		// Si el flujo de la función llegó a este punto sin retornar, significa que el número es válido:
         return true;
     }
 	
-	//Metodo para mostrar el tablero de jugadores
-	var ShowBoard = function(){        
-        var Url = UrlServer + ":" + PortServer + "/players/board/" + PlayerID,
-			Request = $.ajax({ type: "GET", url: Url, dataType: "json" });
-
+	// Método para mostrar el tablero de jugadores:
+	var ShowBoard = function(){ 
+	
+		// Esconde el escudo grande y la información del jugador seleccionado anteriormente:
+		$("#PlayerContainer").hide(); 	
+	
+		// Guarda la dirección URL para traer el tablero y hace el request AJAX:
+        var Url = UrlServer + ":" + PortServer + "/players/board/" + PlayerID;
+		var Request = $.ajax({ type: "GET", url: Url, dataType: "json" });
+				
+		// Si el request fue exitoso:
         Request.done(function(response) {
-            var TableRow, // Fila del tablero de jugadores
-				UUID; // Universally unique identifier
+            var UUID; // Universally unique identifier.
 			
-            // Dibujo la tabla de jugadores con numero activado
+            // Dibujo la tabla de jugadores que tengan el número activado:
             for(var i in response["players"]){
-                if(response["players"][i]["numberActivated"] == true){
-					UUID = response["players"][i]["publicUuid"];
-                    
+			
+				// Verifica que el jugador "i" tenga el número activado:
+                if(response["players"][i]["numberActivated"]){
+					UUID = response["players"][i]["publicUuid"]; //Guarda el publicUuid en la variable.
+					
+					// Agrega un span con el escudo del jugador en el div BoardContainer:
                     $("#BoardContainer").append('<span id="spn' + UUID +'">' + CreateIdenticon(UUID) + '</span>');
-                    $("#img" + UUID).click(function(PublicID){
+                    
+					// Indica que al hacer clic en el escudo, se dispare la función ShowPlayer (mostrar jugador).
+					$("#img" + UUID).click(function(PublicID){
                         return function(){
                             ShowPlayer(PublicID);
                         }
-                    }(UUID)) // Closure super archi copado
+                    }(UUID)) // Closure súper-archi-copado.
                 }
             }   
-            BoardRefreshInterval = self.setInterval(function(){ RefreshBoard(); }, 1000); //Actualiza el tablero cada 1 segundo
-        })
-    
+            BoardRefreshInterval = self.setInterval(function(){ RefreshBoard(); }, 1000); // Actualiza el tablero cada 1 segundo.
+			$("#txtGuess").focus(); // Pone el foco en el Input Text para adivinar números.
+        });
+		
+		// Si el request fue fallido:
         Request.fail(function(jqXHR, textStatus) {
-            if(jqXHR.status == 521) {
+            
+			// Verifica el error y manda el mensaje:
+			if(jqXHR.status == 521) {
 				$("#LoginResponse").html(jqXHR.status + ": UUID inexistente.");
             } else {
                 $("#LoginResponse").html(jqXHR.status + ": Error desconocido.");
 			}
+			
+			// Muestra la pantalla de registro nuevamente:
 			$("#divBoard").hide();
 			$("#divLogin").show();
 			$("#txtName").focus();
         });
-		$("#txtGuess").focus();
     }
 	
-	// Metodo para actualizar el tablero de jugadores
-    var RefreshBoard = function ()
-    {
+	// Método para actualizar el tablero de jugadores:
+    var RefreshBoard = function() {
+		
+		// Guarda la dirección URL para actualizar el tablero y hace el request AJAX:
         var Url = UrlServer + ":" + PortServer + "/players/board/" + PlayerID,
 			Request = $.ajax({ type: "GET", url: Url, dataType: "json" });
 
+		// Si el request fue exitoso:
         Request.done(function(response) {
-            var TableRow, // Fila del tablero de jugadores
-				UUID; // Universally unique identifier
+			var UUID; // Universally unique identifier.
 
-            // Verifico que no me hayan adivinado el numero, en caso de error lo mando a la pantalla para que setee el numero nuevamente
+            // Si al usuario le adivinaron el número secreto, lo manda a la pantalla para que setee otro número:
             if(response["me"][0]["numberActivated"] == false){
-                window.clearInterval(BoardRefreshInterval); // Dejo de actualizar el tablero
+                window.clearInterval(BoardRefreshInterval); // Deja de actualizar el tablero.
 				$("#divBoard").hide();
 				$("#divSetNumber").show();
 				$("#SetNumberResponse").html("Su numero ha sido adivinado. Por favor, ingrese otro para continuar.");
@@ -157,83 +188,94 @@ var GuessMyNumberClientFramework = function(){
                 return;
             }
 			
-            // Redibujo la tabla con todos los jugadores activos
-            flag = false;
-            $("#BoardContainer").html("");
+            // Redibujo el tablero con todos los jugadores activos:
+            flag = false; // Variable bandera para comprobar si el número que está adivinando no fue averiguado por otra persona.
+            $("#BoardContainer").html(""); // Borra el tablero viejo.
             for (var i in response["players"]){
+				// Si el jugador "i" tiene número activado:
                 if(response["players"][i]["numberActivated"] == true){
-					UUID = response["players"][i]["publicUuid"]; // Asigno el UUID del jugador actual
-					if (UUID == CurrentTarget) flag = true // Comparo que el objetivo actual siga activo
+					UUID = response["players"][i]["publicUuid"]; // Asigna el UUID del jugador actual.
+					if (UUID == CurrentTarget) flag = true // Verifica que el objetivo actual siga activo.
+					
+					// Agrega un span con el escudo del jugador "i":
                     $("#BoardContainer").append('<span id="spn' + UUID +'">' + CreateIdenticon(UUID) + '</span>');
+					
+					// Indica que al hacer clic en el escudo, se dispare la función ShowPlayer (mostrar jugador):
                     $("#img" + UUID).click(function(PublicID){
                         return function(){
                             ShowPlayer(PublicID);
                         }
-                    }(UUID)) //Closure super archi copado
+                    }(UUID)) // Closure.
                 }
             }
-			$("#PlayerBadge > img").attr("class", "PlayerBadge"); // Aplico a todos los escudos el estilo por defecto
-			if (flag) $("#img" + CurrentTarget).attr("class", "SelectedBadge"); // Destaco el escudo seleccionado
+			$("#PlayerBadge > img").attr("class", "PlayerBadge"); // Aplica a todos los escudos el estilo por defecto.
+			if (flag) $("#img" + CurrentTarget).attr("class", "SelectedBadge"); // Destaca el escudo del jugador seleccionado por el usuario.
 
-            // Verifico que el jugador este en la lista de activos
+            // Si el jugador seleccionado ya no está activo, esconde su información:
             if (!flag){
                 $("BoardResponse").html("Ya han adivinado el numero del jugador.");
 				$("PlayerCommands").hide();
                 return false;
-            }			
-        })
+            }	
+			
+			// Luego de haber mostrado el tablero, pone el foco en el Input Text para probar números:
+			$("#txtGuess").focus();
+        });
 
-        // Verifico errores y en caso de producirse lo mando otra vez a la pantalla de registro
+        // Verifica errores y, en caso de haberse producido alguno, lo manda otra vez a la pantalla de registro:
 		Request.fail(function(jqXHR, textStatus) {
-	
-			// Muestro el mensaje de error en la pantalla de login.
+				
+			// Deja de actualizar el tablero de jugadores: 
+			window.clearInterval(BoardRefreshInterval);
+			
+			// Regresa a la pantalla de registro:
+			$("#divBoard").hide();
+			$("#divLogin").show();
+			$("#txtName").focus();
+			
+			// Muestra el mensaje de error:
             if(jqXHR.status == 521) {
 				$("#LoginResponse").html(jqXHR.status + ": Se ha reiniciado el servidor o supero el tiempo de inactividad, registrese nuevamente.");
             } else {
                 $("#LoginResponse").html(jqXHR.status + ": Error desconocido.");
 			}
 			
-			// Doy de baja el refresh a la tabla de jugadores.
-			window.clearInterval(BoardRefreshInterval);
-			
-			// Muestro las <div> correspondientes.
-			$("#divBoard").hide();
-			$("#divLogin").show();
-			$("#txtName").focus();
-			
         });
-		$("#txtGuess").focus();
     }
 	
-	// Metodo para mostrar avatares identicon
+	// Método para mostrar avatares Identicon:
 	var CreateIdenticon = function(UUID, Size){
-		var ShorterUUID = UUID.substring(0, 8), // Trunca el string // 0=comienzo // 8=longitud
-			_Size = "&s=" + Size,
+		var ShorterUUID = UUID.substring(0, 8), // Trunca el string. // 0=comienzo // 8=longitud
 			ImgURL = "http://www.gravatar.com/avatar/" + ShorterUUID + "?d=identicon&r=PG",
 			ImgHTML;
-		ImgURL += Size ? _Size : "";
+		ImgURL += Size ? "&s=" + Size : "";
 		ImgHTML = '<img class="PlayerBadge" id=img' + UUID + ' src=' + ImgURL + '></img> ';
 		return ImgHTML;
 	}
 	
 	
-	// Metodo para adivinar numeros.
+	// Método para adivinar numeros:
 	var AttemptNumber = function(){
-		$("#AttemptNumberResponse").html("");
-        var number = $("#txtGuess").val();  
 
-        // Valido numero ingresado por el usuario
+		$("#AttemptNumberResponse").html(""); // Borra el mensaje de error anterior.
+        var number = $("#txtGuess").val(); // Asigna el número ingresado.
+
+        // Valida el número ingresado:
         if(isNaN(number) || number.length < 4){
             $("#AttemptNumberResponse").html("El numero ingresado no es valido.");
             return false;
         }
-
+		
+		// Guarda la dirección URL para adivinar números y hace el request AJAX:
         var Url = UrlServer + ":" + PortServer + "/play/guessnumber/" + PlayerID + "/" + CurrentTarget + "/" + number;
         var Request = $.ajax({ type: "GET", url: Url, dataType: "json" });
-
+	
+		// Si el request fue exitoso:
         Request.done(function(response) {
+				// Fila para la tabla de números intentados:
                 var NumberRow = '<tr id="' + response["numberId"] + '"><td>' + response["number"] + '</td> <td>' + response["correctChars"] + '</td><td>' + response["existingChars"] + '</td></tr>';
 				
+				// Muestra la tabla de intentos realizados y pone el intento actual en la primera posición:
 				$("#tblNumbersGuessed").show();
 				if ($("#tblNumbersGuessed tbody").html()) {
 					$("#tblNumbersGuessed tbody > tr:first").before(NumberRow);
@@ -241,19 +283,23 @@ var GuessMyNumberClientFramework = function(){
 					$("#tblNumbersGuessed tbody").append(NumberRow);
 				}
 
-                // Guardo el historico de numeros intentados
+                // Guarda el historial de números intentados:
 				var auxJson = {"numberId": response["numberId"], "number": response["number"], "correct": response["correctChars"], "incorrect": response["wrongChars"], "exist": response["existingChars"]}
 				if(AttemptedNumbers[CurrentTarget] === undefined){
                     AttemptedNumbers[CurrentTarget] = [];
                 }
                 AttemptedNumbers[CurrentTarget].push(auxJson);
 				
-                // Compruebo si el numero ingresado es el correcto
+                // Verifica si el número ingresado es correcto:
                 if(response["correctChars"] == 4){
                     $("#AttemptNumberResponse").html("Has adivinado el numero secreto!");
                 }
-        })
-    
+				
+				// Retorna el foco al Input Text para seguir intentando números:
+				$("#txtGuess").focus();
+        });
+		
+		// Si el request fue fallido:    
         Request.fail(function(jqXHR, textStatus) {
             if(jqXHR.status == 521)
                 $("#AttemptNumberResponse").html("No existe usuario con ese UUID.");
@@ -270,10 +316,9 @@ var GuessMyNumberClientFramework = function(){
             else
                 $("#AttemptNumberResponse").html(jqXHR.status + " Error desconocido.");
         });
-		$("#txtGuess").focus();
     } 
 	
-	// Metodo para mostrar los intentos de adivinacion realizados
+	// Método para mostrar el historial de números intentados:
 	var ShowAttempts = function(UUID) {
 		$('#tblNumbersGuessed tbody > tr').remove();
 		if(AttemptedNumbers[UUID] != undefined){
@@ -285,35 +330,35 @@ var GuessMyNumberClientFramework = function(){
         }
 	}
 	
-	// Metodo disparado al seleccionar un jugador
-	var ShowPlayer = function(UUID){		
+	// Método disparado al seleccionar un jugador:
+	var ShowPlayer = function(UUID){	
 		CurrentTarget = UUID;
-		$("#PlayerBadge").html(CreateIdenticon(UUID, 150)); // Agranda el avatar del jugador seleccionado
-		$("#PlayerCommands").show(); // Agrega los comandos para adivinar su numero	
+		$("#PlayerContainer").show();
+		$("#PlayerBadge").html(CreateIdenticon(UUID, 150)); // Agranda el avatar del jugador seleccionado.
+		$("#PlayerCommands").show(); // Agrega los comandos para adivinar su número.	
 		$("#PlayerTable").show();
-		$("#txtGuess").val(""); // Borra el ultimo numero ingresado
-		$("#AttemptNumberResponse").html(""); // Borra el ultimo mensaje enviado
-		$("#tblNumbersGuessed tbody").html(""); // Borra los intentos realizados
+		$("#txtGuess").val(""); // Borra el último número ingresado.
+		$("#AttemptNumberResponse").html(""); // Borra el último mensaje enviado.
+		$("#tblNumbersGuessed tbody").html(""); // Borra los intentos realizados.
 		$("#tblNumbersGuessed").hide();
-		//$("#img" + UUID).attr("style", "color: red");
-		$("#PlayerBadge > img").attr("class", "PlayerBadge"); // Aplico a todos los escudos el estilo por defecto
-		$("#img" + UUID).attr("class", "SelectedBadge"); // Destaco el escudo seleccionado
-		ShowAttempts(UUID); // Muestra los intentos realizados a este jugador anteriormente
+		$("#PlayerBadge > img").attr("class", "PlayerBadge"); // Aplica a todos los escudos el estilo por defecto.
+		$("#img" + UUID).attr("class", "SelectedBadge"); // Destaca el escudo seleccionado.
+		ShowAttempts(UUID); // Muestra los números intentados a este jugador anteriormente.
 	}
 	
-	// Metodo para generar nombres aleatorios
+	// Método para generar nombres de usuario aleatorios:
 	var GeneratePlayerName = function(){
 		var PlayerName =  "Jugador" + (Math.floor(Math.random() * (100000))).toString();
 		return PlayerName;
 	}
 	
-	// Metodo para mezclar un array
+	// Método para mezclar un array:
 	shuffle = function(o){
 		for(var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
 		return o;
 	};
 	
-	// Metodo para generar numero aleatorio de 4 cifras distintas
+	// Método para generar un string que contiene un número aleatorio de 4 cifras distintas:
 	GenerateNum_4uniqueCharacters = function(){
 		var Array = shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
 		var String = Array[0].toString();
@@ -323,11 +368,21 @@ var GuessMyNumberClientFramework = function(){
 		return String;
 	}
 	
+	// Método para enviar formularios apretando Enter:
+	SetIntroShortcut = function(element, method) {
+		$(element).keypress(function(event){
+			var keyPressed = (event.keyCode ? event.keyCode : event.which);
+			if (keyPressed == '13') method();
+		});
+	}
+	
+	// Retorna los métodos siguientes, transformándolos en métodos públicos:
 	return {
         "Register": function() { Register(); },
         "SetNumber": function() { SetNumber(); },
         "AttemptNumber": function() { AttemptNumber(); },
 		"GeneratePlayerName": function() { GeneratePlayerName(); },
-		"GenerateNum_4uniqueCharacters": function() { GenerateNum_4uniqueCharacters(); }
+		"GenerateNum_4uniqueCharacters": function() { GenerateNum_4uniqueCharacters(); },
+		"SetIntroShortcut": function() { SetIntroShortcut(element, method); }
     }
 }

@@ -17,30 +17,26 @@
 	<!-- Comienzo script principal -->
 	<script type="text/javascript">
 		var Client = GuessMyNumberClientFramework(); //Es un namespace que retorna un JSON de funciones
-		
-		// Funcion para enviar formularios apretando Enter
-		SetIntroShortcut = function(element, method) {
-			$(element).keypress(function(event){
-				var keyPressed = (event.keyCode ? event.keyCode : event.which);
-				if (keyPressed == '13') method();
-			});
-		}
-		
+				
 		$(document).ready(function(){
 			
-			//Escondo las div correspondientes
+			// Esconde las div correspondientes:
 			$("#divSetNumber").hide();
 			$("#divBoard").hide();
 			$("#PlayerTable").hide();
 			$("#PlayerCommands").hide();
+			
+			// Muestra un nombre de usuario aleatorio:
 			$("#txtName").val("Jugador" + (Math.floor(Math.random() * (100000))).toString()).focus();
+			
+			// Asigna la tecla Enter para confirmar el envío de información:
 			SetIntroShortcut("#txtName", function(){Client.Register()});
 			SetIntroShortcut("#txtServer", function(){Client.Register()});
 			SetIntroShortcut("#txtPort", function(){Client.Register()});
 			SetIntroShortcut("#txtNr", function(){Client.SetNumber()});
 			SetIntroShortcut("#txtGuess", function(){Client.AttemptNumber()});
 			
-			//Asocio los metodos a su correspondiente boton
+			// Asocia los métodos a su correspondiente botón:
 			$("#btnLogin").click(function(){Client.Register()});
 			$("#btnSetNumber").click(function(){Client.SetNumber()});
 			$("#btnGuess").click(function(){Client.AttemptNumber()});
