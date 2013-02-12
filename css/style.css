@@ -20,11 +20,13 @@ Last modified: 11/02/2013
 	margin: 0px;
 }
 #upper-content {
-	/*float: right;
-	height: 100px;*/
+	/*float: right
+	height: 50px;*/
+	width: 100%;
 	margin: 0px;
 	background-color: lightblue;
 	text-align: center;
+	
 }
 #upper-container2 {
 	width: 1024px;
@@ -37,23 +39,23 @@ Last modified: 11/02/2013
 	float: right;
 	width: 30%;
 }
-#tblNumbersGuessed {
+.table {
 	width: 100%;
 	border-collapse: collapse;
 }
-#tblNumbersGuessed td, #tblNumbersGuessed th {
-	border: 1px solid blue;
+.table td, .table th {
+	border: 1px solid #1A1816;
 	padding: 0px 0px 0px 0px;
 }
-#tblNumbersGuessed th  {
+.table th  {
 	text-align: left;
 	/*padding-top: 5px;
 	padding-bottom: 4px;
 	background-color: #FF3867;*/
-	background-color: blue;
+	background-color: #1A1816;
 	color: #ffffff;
 }
-#tblNumbersGuessed tr.alt td  {
+.table tr.alt td  {
 	color:#000000;
 	background-color:#EAF2D3;
 }
@@ -62,7 +64,7 @@ Last modified: 11/02/2013
 	padding: 2px;
 }
 .SelectedBadge {
-	border: 3px solid blue;
+	border: 3px solid #1A1816;
 }
 .BigBadge {
 	border: 3px dashed grey;
@@ -80,6 +82,35 @@ Last modified: 11/02/2013
 body {
 	font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
 	margin: 0px;
-	background-color: #FFE7FF;
+	/*background-color: #FFE7FF;*/
+	background-color: #E9E9E9;
+	background-image: url('../images/subtle_grunge.png');
 	
+}
+ul#menu {
+	list-style-type: none;
+	margin: 0px;
+	padding: 0px;
+	overflow: hidden;
+}
+li#menu {
+	display: inline;
+}
+#menu a, #menu a{
+	display: block;
+	width: 60px;
+}
+#menu a:link, #menu a:visited {
+	display:block;
+	width:120px;
+	font-weight:bold;
+	color:#FFFFFF;
+	background-color:#98bf21;
+	text-align:center;
+	padding:4px;
+	text-decoration:none;
+	text-transform:uppercase;
+}
+#menu a:hover, #menu a:active {
+	background-color:#7A991A;
 }

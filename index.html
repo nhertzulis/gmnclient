@@ -9,6 +9,7 @@
 	
 	<!-- Referencias a hojas de estilos -->
 	<link rel="stylesheet" type="text/css" href="css/style.css"/>
+	<link rel="stylesheet" type="text/css" href="css/menu.css">
 	
 	<!-- Referencias a archivos javascript -->
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
@@ -25,36 +26,49 @@
 			$("#divBoard").hide();
 			$("#PlayerTable").hide();
 			$("#PlayerCommands").hide();
+			$("#divRanking").hide();
 			
 			// Muestra un nombre de usuario aleatorio:
-			$("#txtName").val("Jugador" + (Math.floor(Math.random() * (100000))).toString()).focus();
+			$("#txtName").val(Client.GeneratePlayerName()).focus();
 			
 			// Asigna la tecla Enter para confirmar el envío de información:
-			SetIntroShortcut("#txtName", function(){Client.Register()});
-			SetIntroShortcut("#txtServer", function(){Client.Register()});
-			SetIntroShortcut("#txtPort", function(){Client.Register()});
-			SetIntroShortcut("#txtNr", function(){Client.SetNumber()});
-			SetIntroShortcut("#txtGuess", function(){Client.AttemptNumber()});
+			Client.SetIntroShortcut("#txtName", function(){Client.Register($("#txtName").val())});
+			Client.SetIntroShortcut("#txtServer", function(){Client.Register($("#txtName").val())});
+			Client.SetIntroShortcut("#txtPort", function(){Client.Register($("#txtName").val())});
+			Client.SetIntroShortcut("#txtNr", function(){Client.SetNumber()});
+			Client.SetIntroShortcut("#txtGuess", function(){Client.AttemptNumber()});
 			
 			// Asocia los métodos a su correspondiente botón:
-			$("#btnLogin").click(function(){Client.Register()});
+			$("#btnLogin").click(function(){Client.Register($("#txtName").val().trim())});
 			$("#btnSetNumber").click(function(){Client.SetNumber()});
 			$("#btnGuess").click(function(){Client.AttemptNumber()});
+			$("#linkJugar").click(function(){Client.Play()});
+			$("#linkPuntajes").click();
 			
 		});
 	</script>	
 </head>
 <body>
+	<!-- Comienzo upper-container -->
 	<div id="upper-container" class="user-info">
 		<div id="upper-container2" class="upper-container2">
 			<div id="logo" class="user-info">
 				<h1 style="margin-top: 0">GuessMyNumber</h1>
-				<h2>Browser-game for educational purposes</h3>
-				GitHub: <a href="http://git.jurgens.com.ar/guessmynumber/src">Server</a> - <a href="https://github.com/nhertzulis/gmnclient">Client</a>
+				<h2 style="margin-bottom: 0">Browser-game for educational purposes</h3>
 			</div>
 		</div>
+		<!-- Comienzo menu -->
+	<div id='cssmenu'>
+		<ul>
+			<li><a id="linkJugar" href='#'><span>Jugar</span></a></li>
+			<li><a id="linkPuntajes" href='#'><span>Puntajes</span></a></li>
+			<li><a target="_blank" href="http://git.jurgens.com.ar/guessmynumber/src">Server Repo</a></li>
+			<li><a target="_blank" href="https://github.com/nhertzulis/gmnclient">Client Repo</a></li>
+		</ul>
+	</div> <!-- Fin menu -->
 		<div id="upper-content" class="user-info"></div>
-	</div>
+	</div> <!-- Fin upper-container -->
+			
 	<!-- Comienzo container -->
 	<div id="container" class="container">			
 	
@@ -80,7 +94,23 @@
 				<button id="btnSetNumber">Aceptar</button>
 			</div> <!-- Fin divSetNumber -->
 			
-			<!-- Comienzo divBoard-->
+			<!-- Comienzo divRanking -->
+			<div id="divRanking">
+				<h3>Clasificación:</h3>
+				<table id="tblRanking" class="table">
+					<thead>
+						<tr>
+							<th>Escudo</th>
+							<th>Numero activo</th>
+							<th>Puntuacion</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</div><!-- Fin divRanking -->
+			
+			<!-- Comienzo divBoard -->
 			<div id="divBoard">
 				<h3>Selecciona tu objetivo:</h2>
 				<div id="BoardSuperContainer">
@@ -96,7 +126,7 @@
 							<span id="AttemptNumberResponse" style="color: red"></span>	
 						</div><br/>
 						<div id="PlayerTable">
-							<table id="tblNumbersGuessed">
+							<table id="tblNumbersGuessed" class="table">
 								<thead>
 									<tr>
 										<th>Numero</th>
