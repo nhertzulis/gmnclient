@@ -1,7 +1,7 @@
 /*------------------------------------------------------------
 Author: Nicolás Hertzulis.
-Organization: com.Despegar /  Alto Vuelo 2013.
-Last modified: Apr-14-2013
+Organization: com.despegar /  Alto Vuelo 2013.
+Last modified: Feb-15-2013
 Description: Namespace for http://guessmynumber.jurgens.com.ar/doc API implementation.
 
 Public methods:
@@ -473,11 +473,11 @@ var GuessMyNumberClientFramework = function(){
 	var ShowAttempts = function(UUID) {
 		$('#tblNumbersGuessed tbody > tr').remove();
 		if(AttemptedNumbers[UUID] != undefined){
-            for(var i = 0; i < AttemptedNumbers[UUID].length; i++){
+            for(var i = AttemptedNumbers[UUID].length - 1; i > -1; i--){
                 var Row = '<tr id="' + AttemptedNumbers[UUID][i]["numberId"] + '"><td>' + AttemptedNumbers[UUID][i]["number"] + '</td> <td>' + AttemptedNumbers[UUID][i]["correct"] + '</td><td>' + AttemptedNumbers[UUID][i]["exist"] + '</td></tr>';
                 $("#tblNumbersGuessed tbody").append(Row);
             }
-            if (i > 0) $("#tblNumbersGuessed").show();
+            if (i < AttemptedNumbers[UUID].length - 1) $("#tblNumbersGuessed").show();
         }
 	}
 	
