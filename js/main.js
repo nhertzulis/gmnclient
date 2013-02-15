@@ -396,7 +396,8 @@ var GuessMyNumberClientFramework = function(){
 				$("#divBoard").hide();
 				$("#divSetNumber").show();
 				$("#SetNumberResponse").html("Su numero ha sido adivinado. Por favor, ingrese otro para continuar.");
-				$("#txtNr").focus();
+				$("#txtNr").val(GenerateNum_4uniqueCharacters).focus();
+				
                 return;
             }
 			
