@@ -249,9 +249,6 @@ var GuessMyNumberClientFramework = function(){
 	// 8- Método para mostrar los puntajes:
 	var ShowScores = function(){
 		
-		// Borra la información de la clasificación anterior:
-		$("#tblRanking").html("");
-		
 		// Guarda la dirección URL para traer el ranking y hace el request AJAX:
         var Url = UrlServer + ":" + PortServer + "/players/board/" + PlayerID;
 		var Request = $.ajax({ type: "GET", url: Url, dataType: "json" });
@@ -274,14 +271,14 @@ var GuessMyNumberClientFramework = function(){
             }
 			
 			// Pone al usuario mismo en el primer lugar de la tabla de clasificación:
-			$("#tblNumbersGuessed tbody > tr:first").before("<tr id=" + response["me"][0]["privateUuid"] + "></tr>");
+			$("#tblRanking tbody > tr:first").before("<tr id=" + response["me"][0]["privateUuid"] + "></tr>");
 			$("#tblRanking tr#" + response["me"][0]["privateUuid"]).append("<td>" + CreateIdenticon(response["me"][0]["privateUuid"], "", 40) + "</td>");
 			$("#tblRanking tr#" + response["me"][0]["privateUuid"]).append("<td>" + (response["me"][0]["numberActivated"] ? "Si" : "No") + "</td>");
 			$("#tblRanking tr#" + response["me"][0]["privateUuid"]).append("<td>" + (response["me"][0]["score"]).toString() + "</td>");
-			$("#tblRanking tr#" + response["me"][0]["privateUuid"]).attr("class", "ownRow");
+			//$("#tblRanking tr#" + response["me"][0]["privateUuid"]).attr("class", "ownRow");
 			
 				
-            setTimeout(function(){ ShowScores(); }, 1000); // Actualiza la clasificación cada 1 segundo.
+            //setTimeout(function(){ ShowScores(); }, 1000); // Actualiza la clasificación cada 1 segundo.
 			window.clearInterval(BoardRefreshInterval);
 			$("#divBoard").hide();
 			$("#divSetNumber").hide();

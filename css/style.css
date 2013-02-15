@@ -44,7 +44,7 @@ Last modified: 12/02/2013
 	width: 30%;
 }
 .upper-content2, .user-info {
-	/*background: #999; /* for non-css3 browsers */
+	background: #999; /* for non-css3 browsers */
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#F7A43E', endColorstr='#FF733D'); /* for IE */
 	background: -webkit-gradient(linear, left top, left bottom, from(#F7A43E), to(#FF733D)); /* for webkit browsers */
 	background: -moz-linear-gradient(top,  #F7A43E,  #FF733D); /* for firefox 3.6+ */
@@ -73,11 +73,13 @@ Last modified: 12/02/2013
 	background-color:#EAF2D3;
 }
 .PlayerBadge {
-	border: 1px dashed grey;
-	padding: 2px;
+	border: 0px dashed grey;
+	padding: 3px;
 }
 .SelectedBadge {
-	border: 3px solid #1A1816;
+	border-width: 3px;
+	border-style: solid;
+	border-color: #1A1816;
 }
 .BigBadge {
 	border: 3px dashed grey;
